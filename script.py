@@ -3,6 +3,8 @@ import webbrowser
 import msal
 from dotenv import load_dotenv
 
+MS_GRAPH_BASE_URL = "https://graph.microsoft.com/v1.0"
+
 def get_access_token(application_id, client_secret, scopes):
     client = msal.ConfidentialClientApplication(
         client_id=application_id,
