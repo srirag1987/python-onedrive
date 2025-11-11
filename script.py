@@ -37,3 +37,5 @@ def main():
         print("Access Token:", access_token)
     except Exception as e:
         print("Error:", e)
+
+main()
