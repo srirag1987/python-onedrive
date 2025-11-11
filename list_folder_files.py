@@ -64,7 +64,7 @@ def main():
                 print(f'File Mime type: {folder["file"]["mimeType"]}')
                 print('-' * 50)
             print('-' * 50)
-        folder_id = '70e666ab-a42f-4b31-b890-5c588055c852'
+        folder_id = os.getenv("ROOT_FOLDER_ID")
         list_children = list_folder_children(headers, folder_id)
         for child in list_children: 
             if 'folder' in child:
