@@ -8,8 +8,8 @@ headers = {
 }
 
 # Example: Get SharePoint Site info
-hostname = "yourtenant.sharepoint.com"
-site_path = "/sites/CAD"
+hostname = "ibvogt-my.sharepoint.com"
+site_path = "/sites/HeliosProjectDrawings"
 
 url = f"https://graph.microsoft.com/v1.0/sites/{hostname}:{site_path}"
 response = requests.get(url, headers=headers)

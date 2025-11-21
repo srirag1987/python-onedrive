@@ -9,30 +9,23 @@ def get_access_token(application_id, client_secret, scopes):
     client = msal.ConfidentialClientApplication(
         client_id=application_id,
         client_credential=client_secret,
-        authority="https://login.microsoftonline.com/consumers"
+        authority="https://login.microsoftonline.com/2019dd21-44d9-4bf8-8b6e-aeeba882c8b9"
     )
 
-    auth_request_url = client.get_authorization_request_url(scopes)
-    webbrowser.open(auth_request_url)
-    authorization_code = input("Enter authorization code: ")
+    token_result = client.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
 
-    token_response = client.acquire_token_by_authorization_code(
-        code=authorization_code,
-        scopes=scopes
-    )
-
-    if "access_token" in token_response:
-        return token_response["access_token"]
+    if "access_token" in token_result:
+        return token_result["access_token"]
     else:
-        raise Exception("Failed to acquire access token: " + str(token_response))
-    
+        raise Exception("Failed to acquire access token: " + str(token_result))
+ 
 
 def main():
     load_dotenv()
 
     application_id = os.getenv("APPLICATION_ID")
     client_secret = os.getenv("CLIENT_SECRET")
-    scopes = ["Files.ReadWrite.All", "User.Read"]
+    scopes=["https://graph.microsoft.com/.default"]
 
     try:
         access_token = get_access_token(application_id, client_secret, scopes)

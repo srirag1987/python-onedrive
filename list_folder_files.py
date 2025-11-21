@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from ms_graph import get_access_token, MS_GRAPH_BASE_URL
 
 def list_root_folder(headers):
-    url = f"{MS_GRAPH_BASE_URL}/me/drive/root/children"
+    url = f"{MS_GRAPH_BASE_URL}/users/tchalissery/drive/root/children"
     response = httpx.get(url, headers=headers)
     if response.status_code == 200:
         files = response.json().get("value", [])
@@ -14,7 +14,7 @@ def list_root_folder(headers):
         print("Error fetching files:", response.text)
 
 def list_folder_children(folder_id, headers):
-    url = f"{MS_GRAPH_BASE_URL}/me/drive/items/{folder_id}/children"
+    url = f"{MS_GRAPH_BASE_URL}/users/tchalissery/drive/items/{folder_id}/children"
     response = httpx.get(url, headers=headers)
     if response.status_code == 200:
         files = response.json().get("value", [])
@@ -28,7 +28,7 @@ def main():
 
     application_id = os.getenv("APPLICATION_ID")
     client_secret = os.getenv("CLIENT_SECRET")
-    scopes = ["Files.ReadWrite.All", "User.Read"]
+    scopes = ["https://graph.microsoft.com/.default"]
 
     try:
         access_token = get_access_token(application_id, client_secret, scopes)
