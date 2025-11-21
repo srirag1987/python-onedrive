@@ -39,7 +39,7 @@ def main():
         }
 
         print("Files in Root Folder:")
-        root_folder = list_root_folder(headers)
+        root_folder = list_root_folder(headers, user_id)
         for folder in root_folder: 
             if 'folder' in folder:
                 print(f'Folder id: {folder["id"]}')
