@@ -29,6 +29,7 @@ def main():
     application_id = os.getenv("APPLICATION_ID")
     client_secret = os.getenv("CLIENT_SECRET")
     user_id = os.getenv("USER_ID")
+    folder_id = os.getenv("ROOT_FOLDER_ID")
     scopes = ["https://graph.microsoft.com/.default"]
 
     try:
@@ -65,7 +66,6 @@ def main():
                 print(f'File Mime type: {folder["file"]["mimeType"]}')
                 print('-' * 50)
             print('-' * 50)
-        folder_id = os.getenv("ROOT_FOLDER_ID")
         list_children = list_folder_children(folder_id, headers, user_id)
         for child in list_children: 
             if 'folder' in child:
