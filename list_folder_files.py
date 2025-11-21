@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from ms_graph import get_access_token, MS_GRAPH_BASE_URL
 
 def list_root_folder(headers, user_id):
-    url = f"{MS_GRAPH_BASE_URL}/users/{user_id}/drive"
+    url = f"{MS_GRAPH_BASE_URL}/users/{user_id}"
     response = httpx.get(url, headers=headers)
     print("Response:", response)
     exit()
