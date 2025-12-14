@@ -37,7 +37,7 @@ def main():
         headers = {
             "Authorization": f"Bearer {access_token}"
         }
-
+        print("Access Token:", access_token)
         print("Files in Root Folder:")
         root_folder = list_root_folder(headers, user_id)
         for folder in root_folder: 

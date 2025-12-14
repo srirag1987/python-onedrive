@@ -23,14 +23,14 @@ def get_access_token(application_id, client_secret, scopes):
 def main():
     load_dotenv()
 
-    application_id = os.getenv("APPLICATION_ID")
-    client_secret = os.getenv("CLIENT_SECRET")
-    scopes=["https://graph.microsoft.com/.default"]
+    # application_id = os.getenv("APPLICATION_ID")
+    # client_secret = os.getenv("CLIENT_SECRET")
+    # scopes=["https://graph.microsoft.com/.default"]
 
-    try:
-        access_token = get_access_token(application_id, client_secret, scopes)
-        print("Access Token:", access_token)
-    except Exception as e:
-        print("Error:", e)
+    # try:
+    #     access_token = get_access_token(application_id, client_secret, scopes)
+    #     print("Access Token:", access_token)
+    # except Exception as e:
+    #     print("Error:", e)
 
 main()
