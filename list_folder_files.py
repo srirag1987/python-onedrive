@@ -3,95 +3,60 @@ import httpx
 from dotenv import load_dotenv
 from ms_graph import get_access_token, MS_GRAPH_BASE_URL
 
-def list_root_folder(headers, user_id):
-    url = "https://graph.microsoft.com/v1.0/sites/ibvogt.sharepoint.com:/sites/HeliosProjectDrawings"
-    response = httpx.get(url, headers=headers)
-    if response.status_code == 200:
-        print(response.json())
-        # files = response.json().get("value", [])
-        # for file in files:
-        #     print(f"Name: {file['name']}, ID: {file['id']}")
-    else:
-        print("Error fetching files:", response.text)
 
-# def list_folder_children(folder_id, headers, user_id):
-#     url = f"{MS_GRAPH_BASE_URL}/users/{user_id}/drive/items/{folder_id}/children"
-#     response = httpx.get(url, headers=headers)
-#     if response.status_code == 200:
-#         files = response.json().get("value", [])
-#         for file in files:
-#             print(f"Name: {file['name']}, ID: {file['id']}")
-#     else:
-#         print("Error fetching files:", response.text)
+def get_site_id(headers, site_hostname, site_path):
+    url = f"{MS_GRAPH_BASE_URL}/sites/{site_hostname}:{site_path}"
+    response = httpx.get(url, headers=headers)
+    response.raise_for_status()
+    return response.json()["id"]
+
+
+def list_drive_root(headers, site_id):
+    url = f"{MS_GRAPH_BASE_URL}/sites/{site_id}/drive/root/children"
+    response = httpx.get(url, headers=headers)
+    response.raise_for_status()
+    return response.json()["value"]
+
+
+def print_items(items):
+    for item in items:
+        if "folder" in item:
+            print(f"[FOLDER] {item['name']}  | Items: {item['folder']['childCount']}")
+        else:
+            size_kb = item["size"] / 1024
+            print(f"[FILE]   {item['name']}  | {size_kb:.2f} KB")
+    print("-" * 60)
+
 
 def main():
     load_dotenv()
 
     application_id = os.getenv("APPLICATION_ID")
     client_secret = os.getenv("CLIENT_SECRET")
-    user_id = os.getenv("USER_ID")
-    folder_id = os.getenv("ROOT_FOLDER_ID")
+    site_hostname = os.getenv("SITE_HOSTNAME")
+    site_path = os.getenv("SITE_PATH")
+
     scopes = ["https://graph.microsoft.com/.default"]
 
     try:
         access_token = get_access_token(application_id, client_secret, scopes)
+
         headers = {
-            "Authorization": f"Bearer {access_token}"
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "application/json"
         }
-        print("Files in Root Folder:")
-        root_folder = list_root_folder(headers, user_id)
-        # for folder in root_folder: 
-        #     if 'folder' in folder:
-        #         print(f'Folder id: {folder["id"]}')
-        #         print(f'Folder name: {folder["name"]}')
-        #         print (f'Folder web url: {folder["webUrl"]}')
-        #         print(f'Folder size: {folder["size"]}')
-        #         print(f'Folder created date: {folder["createdDateTime"]}')
-        #         print (f'Created by: {folder["createdBy"]["user"]["displayName"]}) ')
-        #         print(f'Folder modified date: {folder["lastModifiedDateTime"]}')
-        #         print (f'Last modified by: {folder["lastModifiedBy"]["user"]["displayName"]}')
-        #         print(f'Folder parent id: {folder["parentReference"]["id"]}')
-        #         print (f'Item Count: {folder["folder"]["childCount"]}')
-        #         print('-' * 50)
-        #     elif 'file' in folder:
-        #         print(f'File id: {folder["id"]}')
-        #         print(f'File name: {folder["name"]}')
-        #         print(f'File web url: {folder["webUrl"]}')
-        #         print(f'File size (in KB): {folder["size"] / 1024:.2f}')
-        #         print(f'File created date: {folder["createdDateTime"]}')
-        #         print (f'Created by: {folder[" createdBy" ]["user"]["displayName"]}')
-        #         print(f'File modified date: {folder["lastModifiedDateTime"]}')
-        #         print (f'Last modified by: {folder["lastModifiedBy"]["user"]["displayName"]}')
-        #         print(f'File parent id: {folder["parentReference"]["id"]}')
-        #         print(f'File Mime type: {folder["file"]["mimeType"]}')
-        #         print('-' * 50)
-        #     print('-' * 50)
-        # list_children = list_folder_children(folder_id, headers, user_id)
-        # for child in list_children: 
-        #     if 'folder' in child:
-        #         print(f'Folder id: {child["id"]}')
-        #         print(f' Folder name: {child["name"]}')
-        #         print(f' Folder web url: {child["webUrl"]}')
-        #         print(f'Folder size: {child["size"]}')
-        #         print (f'Folder created date: {child["createdDateTime"]}')
-        #         print(f'Created by: {child["createdBy"]["user"][ "displayName"]}')
-        #         print(f' Folder modified date: {child["lastModifiedDateTime"]}')
-        #         print(f' Last modified by: {child["lastModifiedBy"]["user"]["displayName" ]} ')
-        #         print (f'Folder parent id: {child["parentReference"]["id"]}')
-        #         print(f'Item Count: {child["folder"]["childCount"]}')
-        #     elif 'file' in child:
-        #         print (f'File id: {child["id"]}')
-        #         print(f'File name: {child["name"]}')
-        #         print(f'File web url: {child["webUrl"]}')
-        #         print(f'File size (in KB): {child["size"] / 1024:.2f}')
-        #         print(f'File created date: {child["createdDateTime"]}')
-        #         print(f'Created by: {child["createdBy"]["user"]["displayName"]}')
-        #         print(f'File modified date: {child["lastModifiedDateTime"]}')
-        #         print(f'Last modified by: {child["lastModifiedBy"]["user"]["displayName"]}')
-        #         print(f'File parent id: {child["parentReference"]["id"]}')
-        #         print(f'File Mime type: {child["file"]["mimeType"]}')
-        #     print('-' * 50)
+
+        print("Resolving SharePoint site...")
+        site_id = get_site_id(headers, site_hostname, site_path)
+        print(f"Site ID: {site_id}\n")
+
+        print("Listing contents of CAD document library (drive root):\n")
+        items = list_drive_root(headers, site_id)
+        print_items(items)
+
     except Exception as e:
         print("Error:", e)
-    
-main()
+
+
+if __name__ == "__main__":
+    main()
