@@ -4,12 +4,13 @@ from dotenv import load_dotenv
 from ms_graph import get_access_token, MS_GRAPH_BASE_URL
 
 def list_root_folder(headers, user_id):
-    url = "https://ibvogt.sharepoint.com/sites/HeliosProjectDrawings/CAD/Forms/AllItems.aspx?viewpath=%2Fsites%2FHeliosProjectDrawings%2FCAD%2FForms%2FAllItems%2Easpx"
+    url = "https://graph.microsoft.com/v1.0/sites/ibvogt.sharepoint.com:/sites/HeliosProjectDrawings"
     response = httpx.get(url, headers=headers)
     if response.status_code == 200:
-        files = response.json().get("value", [])
-        for file in files:
-            print(f"Name: {file['name']}, ID: {file['id']}")
+        print(response.json())
+        # files = response.json().get("value", [])
+        # for file in files:
+        #     print(f"Name: {file['name']}, ID: {file['id']}")
     else:
         print("Error fetching files:", response.text)
 
@@ -37,35 +38,34 @@ def main():
         headers = {
             "Authorization": f"Bearer {access_token}"
         }
-        print("Access Token:", access_token)
         print("Files in Root Folder:")
         root_folder = list_root_folder(headers, user_id)
-        for folder in root_folder: 
-            if 'folder' in folder:
-                print(f'Folder id: {folder["id"]}')
-                print(f'Folder name: {folder["name"]}')
-                print (f'Folder web url: {folder["webUrl"]}')
-                print(f'Folder size: {folder["size"]}')
-                print(f'Folder created date: {folder["createdDateTime"]}')
-                print (f'Created by: {folder["createdBy"]["user"]["displayName"]}) ')
-                print(f'Folder modified date: {folder["lastModifiedDateTime"]}')
-                print (f'Last modified by: {folder["lastModifiedBy"]["user"]["displayName"]}')
-                print(f'Folder parent id: {folder["parentReference"]["id"]}')
-                print (f'Item Count: {folder["folder"]["childCount"]}')
-                print('-' * 50)
-            elif 'file' in folder:
-                print(f'File id: {folder["id"]}')
-                print(f'File name: {folder["name"]}')
-                print(f'File web url: {folder["webUrl"]}')
-                print(f'File size (in KB): {folder["size"] / 1024:.2f}')
-                print(f'File created date: {folder["createdDateTime"]}')
-                print (f'Created by: {folder[" createdBy" ]["user"]["displayName"]}')
-                print(f'File modified date: {folder["lastModifiedDateTime"]}')
-                print (f'Last modified by: {folder["lastModifiedBy"]["user"]["displayName"]}')
-                print(f'File parent id: {folder["parentReference"]["id"]}')
-                print(f'File Mime type: {folder["file"]["mimeType"]}')
-                print('-' * 50)
-            print('-' * 50)
+        # for folder in root_folder: 
+        #     if 'folder' in folder:
+        #         print(f'Folder id: {folder["id"]}')
+        #         print(f'Folder name: {folder["name"]}')
+        #         print (f'Folder web url: {folder["webUrl"]}')
+        #         print(f'Folder size: {folder["size"]}')
+        #         print(f'Folder created date: {folder["createdDateTime"]}')
+        #         print (f'Created by: {folder["createdBy"]["user"]["displayName"]}) ')
+        #         print(f'Folder modified date: {folder["lastModifiedDateTime"]}')
+        #         print (f'Last modified by: {folder["lastModifiedBy"]["user"]["displayName"]}')
+        #         print(f'Folder parent id: {folder["parentReference"]["id"]}')
+        #         print (f'Item Count: {folder["folder"]["childCount"]}')
+        #         print('-' * 50)
+        #     elif 'file' in folder:
+        #         print(f'File id: {folder["id"]}')
+        #         print(f'File name: {folder["name"]}')
+        #         print(f'File web url: {folder["webUrl"]}')
+        #         print(f'File size (in KB): {folder["size"] / 1024:.2f}')
+        #         print(f'File created date: {folder["createdDateTime"]}')
+        #         print (f'Created by: {folder[" createdBy" ]["user"]["displayName"]}')
+        #         print(f'File modified date: {folder["lastModifiedDateTime"]}')
+        #         print (f'Last modified by: {folder["lastModifiedBy"]["user"]["displayName"]}')
+        #         print(f'File parent id: {folder["parentReference"]["id"]}')
+        #         print(f'File Mime type: {folder["file"]["mimeType"]}')
+        #         print('-' * 50)
+        #     print('-' * 50)
         # list_children = list_folder_children(folder_id, headers, user_id)
         # for child in list_children: 
         #     if 'folder' in child:
