@@ -1,5 +1,5 @@
 import httpx
-from shared.ms_graph import MS_GRAPH_BASE_URL
+from ms_graph import MS_GRAPH_BASE_URL
 
 
 def get_site_id(headers, hostname, path):
