@@ -1,5 +1,4 @@
 sqlalchemy
-pyodbc
 httpx
 msal
 python-dotenv
