@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from shared.config import *
+from config import *
 
 DATABASE_URL = (
     f"mssql+pyodbc://{DB_USERNAME}:{DB_PASSWORD}"
@@ -11,6 +11,7 @@ DATABASE_URL = (
 engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(bind=engine)
+
 
 def get_db():
     return SessionLocal()

@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 APPLICATION_ID = os.getenv("APPLICATION_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
