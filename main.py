@@ -27,6 +27,11 @@ def main():
     db = get_db()
 
     for item in items:
+        print({
+            "name": item.get("name"),
+            "type": "FOLDER" if "folder" in item else "FILE",
+            "size": item.get("size")
+        })
 
         if "folder" in item:
             record = FileRecord(
