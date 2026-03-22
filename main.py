@@ -1,57 +1,85 @@
+import json
+from datetime import datetime
+
 from config import *
 from ms_graph import get_access_token
 from graph_service import get_site_id, get_cad_drive_id, list_files
 
 from db import engine, get_db
-from models import Base, FileRecord
+from models import Base, Project, Country
+
+
+def parse_datetime(dt_str):
+    if not dt_str:
+        return None
+    return datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
 
 
 def main():
 
-    # Create table if not exists
     Base.metadata.create_all(bind=engine)
 
-    print("🔐 Getting access token...")
+    print("🔐 Getting token...")
     token = get_access_token(APPLICATION_ID, CLIENT_SECRET, TENANT_ID)
 
     headers = {
         "Authorization": f"Bearer {token}"
     }
 
-    print("🌐 Fetching SharePoint data...")
+    print("📡 Fetching data...")
     site_id = get_site_id(headers, SITE_HOSTNAME, SITE_PATH)
     drive_id = get_cad_drive_id(headers, site_id)
     items = list_files(headers, site_id, drive_id)
 
-    print("💾 Saving to SQL Server...")
     db = get_db()
 
+    print("💾 Saving folders to projects table...\n")
+
     for item in items:
-        print({
-            "name": item.get("name"),
-            "type": "FOLDER" if "folder" in item else "FILE",
-            "size": item.get("size")
-        })
 
-        if "folder" in item:
-            record = FileRecord(
-                name=item["name"],
-                size_kb=0,
-                item_type="FOLDER"
-            )
-        else:
-            record = FileRecord(
-                name=item["name"],
-                size_kb=int(item["size"] / 1024),
-                item_type="FILE"
-            )
+        # ✅ Only folders (parent level)
+        if "folder" not in item:
+            continue
 
-        db.add(record)
+        folder_name = item.get("name")
+        web_url = item.get("webUrl")
+
+        created = parse_datetime(item.get("createdDateTime"))
+        modified = parse_datetime(item.get("lastModifiedDateTime"))
+
+        # ✅ Avoid duplicates
+        existing = db.query(Project).filter_by(name=folder_name).first()
+        if existing:
+            print(f"Skipping existing: {folder_name}")
+            continue
+
+        project = Project(
+            name=folder_name,
+            web_url=web_url,
+            created_at_graph=created,
+            last_modified=modified,
+            raw_json=json.dumps(item)  # store full response
+        )
+
+        db.add(project)
+
+        # 🌍 OPTIONAL: extract country from name (example logic)
+        # e.g. "Germany_Project1"
+        if "_" in folder_name:
+            country_name = folder_name.split("_")[0]
+
+            country = db.query(Country).filter_by(name=country_name).first()
+
+            if not country:
+                country = Country(name=country_name)
+                db.add(country)
+
+            project.countries.append(country)
 
     db.commit()
     db.close()
 
-    print("✅ Data saved successfully!")
+    print("\n✅ Projects saved successfully!")
 
 
 if __name__ == "__main__":
