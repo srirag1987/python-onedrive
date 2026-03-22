@@ -1,6 +1,6 @@
-fastapi
-uvicorn
+azure-functions
 sqlalchemy
-aiosqlite
+pyodbc
+httpx
+msal
 python-dotenv
-greenlet
